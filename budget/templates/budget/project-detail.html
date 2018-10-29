@@ -1,0 +1,184 @@
+{% extends 'budget/base.html' %}
+    
+{% block body %}
+<div class="container">
+    <section class="section section-stats">
+        <div class="row">
+            <div class="col s12 m12 l4">
+                <div class="card-panel">
+                    <h6 class="bold">Total Budget</h6>
+                    <h1 class="bold">${{ project.budget }}</h1>
+                </div>
+            </div>
+            <div class="col s12 m6 l4">
+                <div class="card-panel">
+                    <h6 class="bold">Budget Left</h6>
+                    {% if project.budget_left > 0 %}
+                    <h1 class="bold green-text">${{ project.budget_left }}</h1>
+                    {% elif project.budget_left == 0 %}
+                    <h1 class="bold grey-text">${{ project.budget_left }}</h1>
+                    {% else %}
+                    <h1 class="bold red-text">${{ project.budget_left }}</h1>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col s12 m6 l4">
+                <div class="card-panel">
+                    <h6 class="bold">Total Transiction</h6>
+                    <h1 class="bold">{{ project.total_transaction }}</h1>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="section section-expenses">
+        <div class="row">
+            <button class="btn waves-effect right modal-trigger" href="#expenseModal">
+                <i class="material-icons white-text left">add_circles</i>
+                Add Expense
+            </button>
+        </div>
+        <ul class="z-depth-1">
+            {% for expense in expense_list %}
+            <li>
+                <div class="card-panel z-depth-0 expense">
+                    <div class="row">
+                        <div class="col l6">
+                            <span class="title">{{ expense.title }}</span>
+                        </div>
+                        <div class="col l3">
+                            <span class="title">{{ expense.amount }}</span>
+                        </div>
+                        <div class="col l">
+                            <span class="title bold">{{ expense.category.name }}</span>
+                        </div>
+                        <!-- <div class="col l2">
+                            <span class="title">{# expense.test #}</span>
+                        </div> -->
+                        <a onclick="deleteExpense(this)" data-id="{{ expense.id }}">
+                            <i class="material-icons red-text right">close</i>
+                        </a>
+                    </div>
+                </div>
+            </li>
+        {% endfor %}
+        </ul>
+    </section>
+    <div class="row">
+        <div class="col s1 offset-s11">
+            <button class="btn-floating btn-large btn waves-effect waves-teal modal-trigger" href="#analyseModal"><i class="medium material-icons">arrow_drop_up</i></button>
+        </div>
+    </div>
+</div>
+</div>
+<div id="expenseModal" class="modal">
+    <div class="modal-content">
+      <h4>Add Expense</h4>
+  
+      <form method="POST">
+        {% csrf_token %}
+        <label for="title">Title</label>
+        <input name="title" id="title">
+  
+        <label for="amount">Amount</label>
+        <input name="amount" id="amount">
+  
+        <select name="category">
+          {% for category in category_list %}
+          <option>{{ category.name }}</option>
+          {% endfor %}
+        </select>
+  
+        <button type="submit" class="btn">Add</button>
+      </form>
+  </div>
+</div>
+
+<div id="analyseModal" class="modal bottom-sheet">
+    <div class="modal-content">
+        <div id="piechart_3d" style="width: 900px; height: 500px;"></div>
+    </div>
+    <div class="modal-footer">
+      <!-- <h5>Lol</h5> -->
+    </div>
+</div>
+
+  
+</div>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+    var arr = []
+    {% for expense in expense_list %}
+    arr.push('{{ expense.category }}')
+    {% endfor %}
+    function eliminateDuplicates(arr) {
+        var i,
+            len = arr.length,
+            out = [],
+            obj = {};
+
+        for (i = 0; i < len; i++) {
+            obj[arr[i]] = 0;
+        }
+        for (i in obj) {
+            out.push(i);
+        }
+        return out;
+    }
+    
+    google.charts.load("current", {packages:["corechart"]});
+    google.charts.setOnLoadCallback(drawChart);
+    eliminateDuplicates(arr)
+    function drawChart() {
+    var data = google.visualization.arrayToDataTable([
+    ['Budget spent', '{{ project.name }}'],
+    {% for sees,see in names %}
+    ['{{ sees }}', {{ see }}],
+    {% endfor %}
+    //   ['Eat',      2],
+    //   ['Commute',  2],
+    //   ['Watch TV', 2],
+    //   ['Sleep',    7]
+    ]);
+    
+    
+
+    var options = {
+        title: 'Money spent on',
+        is3D: true,
+    };
+
+    var chart = new google.visualization.PieChart(document.getElementById('piechart_3d'));
+    chart.draw(data, options);
+    }
+</script>
+  </head>
+  
+    
+  
+<script>
+var elem = document.querySelectorAll('.modal')
+var instance = M.Modal.init(elem)
+
+var elem = document.querySelector('select')
+var instance = M.FormSelect.init(elem)
+
+function deleteExpense(e){
+
+    let id = e.dataset.id
+    e.closest('li').remove()
+
+    fetch('',{
+        method : 'DELETE',
+        headers : {
+            // csrf_token needed
+            // request will be forbidden if csrf_token is null
+            'X-CSRFToken' : '{{ csrf_token }}'
+        },
+        body: JSON.stringify({
+            'id':id
+        }),
+        credentials: 'same-origin',
+    })
+}
+</script>
+{% endblock %}

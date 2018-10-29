@@ -1,0 +1,31 @@
+{% extends 'budget/base.html' %}
+{% block body %}
+<div class="container">
+    <div class="col s10 m8 l6">
+        <div class="card-panel">
+            <h3 class="warning-text red-text">
+                Do you want to delete your project?
+            </h3>
+            
+            <button class="btn" onclick="deleteProject(this)">Yes</button>
+            <button class="btn" href="{% url 'budget:detail' project.slug %}">No</button>
+        </div>
+    </div>
+</div>
+<script>
+function deleteProject(e){
+fetch('',{
+    method : 'DELETE',
+    headers : {
+        // csrf_token needed
+        // request will be forbidden if csrf_token is null
+        'X-CSRFToken' : '{{ csrf_token }}'
+    },
+    // body: JSON.stringify({
+    //     'id':id
+    // }),
+    credentials: 'same-origin',
+})
+}
+</script>
+{% endblock %}
