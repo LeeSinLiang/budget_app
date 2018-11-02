@@ -3,10 +3,6 @@
 {% block head %}Login{% endblock %}
 {% block body %}
 <div class="wrapper">
-    {% if form.errors %}
-        <p>Your username and password didn't match. Please try again.</p>
-    {% endif %}
-
     <!--
     <form method="post" action=".">{% csrf_token %}
         <table border="0">
@@ -19,6 +15,9 @@
     <a href="/register">Register</a>
 -->
     <form class="form" method="post" action="." >{% csrf_token %}
+        {% if form.errors %}
+        <p style="color:red;">Your username and password didn't match. Please try again.</p><br>
+        {% endif %}
         <input type="text" placeholder="Username" name="username">
         <input type="password" placeholder="Password" name="password">
         <button type="submit"  value="Login" id="login-button">Login</button>

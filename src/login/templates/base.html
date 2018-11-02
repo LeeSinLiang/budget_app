@@ -18,8 +18,10 @@
 <body>
       <div class="topnav" id="myTopnav">
             <a href="{% url 'budget:list' %}" class="home">Budget</a>
+            {% if request.user.is_authenticated %}
             <a href="#">Logout</a>
             <a href="{% url 'budget:create' %}">Add Project </a>
+            {% endif %}
             <a href="javascript:void(0);" class="icon" onclick="myFunction()">
                   <i class="fa fa-bars"></i>
             </a>

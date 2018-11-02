@@ -97,6 +97,7 @@ class ProjectCreateView(CreateView):
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
+        self.object.user = self.request.user
         self.object.save()
 
         categories = self.request.POST['categoriesString'].split(',')

@@ -41,6 +41,16 @@ body {
     margin: 4em 2em;
 }
 
+.test1 {
+    margin: 2em 2em;
+}
+
+label {
+    color: black;
+    font-size: 1em;
+    text-align: left !important;
+}
+
 .bold {
     font-weight: bold;
 }
